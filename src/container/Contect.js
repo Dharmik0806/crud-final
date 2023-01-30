@@ -90,18 +90,21 @@ function Contect(props) {
 
         let localData = JSON.parse(localStorage.getItem("contect"));
 
+       let idData = Math.round(Math.random() * 1000);
+       let fidData = {...values ,id : idData}
+
+       
+        // console.log("sid" + idData);
         // console.log(localData);
 
         if (localData !== null) {
-            localData.push(values)
+            localData.push(fidData)
             localStorage.setItem("contect", JSON.stringify(localData))
             setCondata(localData)
         } else {
-            localStorage.setItem("contect", JSON.stringify([values]))
-            setCondata(values)
-
+            localStorage.setItem("contect", JSON.stringify([fidData]))
+            setCondata(fidData)
         }
-
         console.log(localData);
     }
 
