@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -11,48 +11,69 @@ import { Construction } from '@mui/icons-material';
 import * as yup from 'yup';
 import { Form, Formik, useFormik } from 'formik';
 import { DataGrid } from '@mui/x-data-grid';
-
-
-const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'firstName', headerName: 'First name', width: 130 },
-    { field: 'lastName', headerName: 'Last name', width: 130 },
-    {
-        field: 'age',
-        headerName: 'Age',
-        type: 'number',
-        width: 90,
-    },
-    {
-        field: 'fullName',
-        headerName: 'Full name',
-        description: 'This column has a value getter and is not sortable.',
-        sortable: false,
-        width: 160,
-        valueGetter: (params) =>
-            `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
-];
-      
-const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-];
-
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 
 function Contect(props) {
 
+    const hendelDelet = (values) => {
+        console.log(values);
+        console.log(values.id);
+        let localData = JSON.parse(localStorage.getItem("contect"));
+        let dData = localData.filter((l) => l.id !== values.id);
+        localStorage.setItem("contect", JSON.stringify(dData));
+        // setCondata(dData);
+        console.log(dData);
+    }
+
     // State
     const [open, setOpen] = React.useState(false);
     const [conData, setCondata] = useState([])
+    const [dopen, setDopen] = React.useState(false);
+
+    const handleDclickopen = () => {
+        setDopen(true);
+    };
+
+    const handleDclose = () => {
+        setDopen(false);
+    };
+
+
+    useEffect(() => {
+        let localData = JSON.parse(localStorage.getItem("contect"));
+
+        if (localData !== null) {
+            // localStorage.setItem("contect" , JSON.stringify(localData))   // aa no aave
+            setCondata(localData)
+        }
+    })
+
+
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 70 },
+        { field: 'name', headerName: 'Name', width: 70 },
+        {
+            field: 'Action', headerName: 'Action', with: 70,
+            renderCell: (params) => {
+                return (
+                    <>
+                        <IconButton aria-label="delete" sx={{ border: "1px solid black" }} onClick={() => {hendelDelet(params.row);handleDclickopen()} }>
+                            <DeleteIcon />
+                             {/* { setDid(params.row.id); setDOpen(true) }}  */}
+                        </IconButton>
+                        <IconButton aria-label="delete" sx={{ border: "1px solid blue" }}>
+                            <ModeEditIcon />
+                        </IconButton>
+                    </>
+                )
+            }
+        }
+        // { field: 'firstName', headerName: 'First name', width: 130 },
+        // { field: 'lastName', headerName: 'Last name', width: 130 },
+    ];
 
 
     // Methode
@@ -90,10 +111,10 @@ function Contect(props) {
 
         let localData = JSON.parse(localStorage.getItem("contect"));
 
-       let idData = Math.round(Math.random() * 1000);
-       let fidData = {...values ,id : idData}
+        let idData = Math.round(Math.random() * 1000);
+        let fidData = { ...values, id: idData }
 
-       
+
         // console.log("sid" + idData);
         // console.log(localData);
 
@@ -159,13 +180,43 @@ function Contect(props) {
                 {/* Table */}
                 <div style={{ height: 400, width: '100%' }}>
                     <DataGrid
-                        rows={rows}
+                        rows={conData}
                         columns={columns}
                         pageSize={5}
                         rowsPerPageOptions={[5]}
                         checkboxSelection
                     />
                 </div>
+
+                {/* Delet Alert */}
+                <div>
+                    <Button variant="outlined" onClick={handleDclickopen}>
+                        Open alert dialog
+                    </Button>
+                    <Dialog
+                        open={dopen}
+                        onClose={handleDclose}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">
+                            {"Use Google's location service?"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                Let Google help apps determine location. This means sending anonymous
+                                location data to Google, even when no apps are running.
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleDclose}>Disagree</Button>
+                            <Button onClick={handleDclose} autoFocus>
+                                Agree
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+
             </div>
 
         </div>
