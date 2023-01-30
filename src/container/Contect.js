@@ -18,20 +18,14 @@ import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 function Contect(props) {
 
-    const hendelDelet = (values) => {
-        console.log(values);
-        console.log(values.id);
-        let localData = JSON.parse(localStorage.getItem("contect"));
-        let dData = localData.filter((l) => l.id !== values.id);
-        localStorage.setItem("contect", JSON.stringify(dData));
-        // setCondata(dData);
-        console.log(dData);
-    }
+
 
     // State
     const [open, setOpen] = React.useState(false);
     const [conData, setCondata] = useState([])
     const [dopen, setDopen] = React.useState(false);
+    const [did, setDid] = useState();
+    const [eid , setEid] = useState();
 
     const handleDclickopen = () => {
         setDopen(true);
@@ -51,7 +45,22 @@ function Contect(props) {
         }
     })
 
+    const handleDelet = (values) => {
+        // console.log(values);
+        // console.log(values.id);
 
+        let localData = JSON.parse(localStorage.getItem("contect"));
+        // let dData = localData.filter((l) => l.id !== values.id);
+
+        let dData = localData.filter((l) => l.id !== did);
+        localStorage.setItem("contect", JSON.stringify(dData));
+
+        // setCondata(dData);
+        // console.log(dData);
+
+        setDopen(false);
+
+    }
     const columns = [
         { field: 'id', headerName: 'ID', width: 70 },
         { field: 'name', headerName: 'Name', width: 70 },
@@ -60,11 +69,15 @@ function Contect(props) {
             renderCell: (params) => {
                 return (
                     <>
-                        <IconButton aria-label="delete" sx={{ border: "1px solid black" }} onClick={() => {hendelDelet(params.row);handleDclickopen()} }>
+                        {/* <IconButton aria-label="delete" sx={{ border: "1px solid black" }} onClick={() => {hendelDelet(params.row);handleDclickopen()} }> */}
+                        <IconButton aria-label="delete" sx={{ border: "1px solid black" }} onClick={() => { setDid(params.row.id); handleDclickopen() }}>
                             <DeleteIcon />
-                             {/* { setDid(params.row.id); setDOpen(true) }}  */}
+                            {/* { setDid(params.row.id); setDOpen(true) }}  */}
                         </IconButton>
-                        <IconButton aria-label="delete" sx={{ border: "1px solid blue" }}>
+                        <IconButton aria-label="delete" sx={{ border: "1px solid blue" }}
+                            //   onClick={() => setOpen(true)}
+                            onClick={() => { handleUpdate(params.row) }}
+                        >
                             <ModeEditIcon />
                         </IconButton>
                     </>
@@ -99,7 +112,11 @@ function Contect(props) {
         onSubmit: values => {
             console.log(values);
 
-            contectData(values);
+            if(eid) {
+                handleUpdateData(values)
+            }else{
+                contectData(values);
+            }
             setOpen(false);
         },
     });
@@ -129,6 +146,18 @@ function Contect(props) {
         console.log(localData);
     }
 
+    const handleUpdate = (values) => {
+        // console.log("update : " + values.id);
+        // console.log("handleupdate");
+        setEid(values);
+        setOpen(true);
+        setValues(values);
+    }
+
+    const handleUpdateData = () => {
+
+    }
+    
     return (
         <div>
             <h1>Contect</h1>
@@ -156,6 +185,7 @@ function Contect(props) {
                                 <TextField
                                     margin="dense"
                                     id="name"
+                                    value={values.name}
                                     name="name"
                                     label="Name"
                                     type="text"
@@ -210,7 +240,7 @@ function Contect(props) {
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={handleDclose}>Disagree</Button>
-                            <Button onClick={handleDclose} autoFocus>
+                            <Button onClick={handleDelet} autoFocus>
                                 Agree
                             </Button>
                         </DialogActions>
